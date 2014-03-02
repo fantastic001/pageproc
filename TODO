@@ -1,0 +1,10 @@
+
+TODO LIST AND BUG LIST 
+
+* Text with only one line is recognizes as drawing (has no empty lines) - find solution for recognizing big images as drawings instead of text (this is caused without rule for empty lines)
+
+* code review
+
+* testing
+
+* writing

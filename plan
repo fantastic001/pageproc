@@ -1,0 +1,47 @@
+
+TypeUnsupportedFeatureException
+
+Element 
+
+	getMatPart: None -> struct matpart 
+
+		returns matpart structure for specified element 
+
+	type: None -> Element::ElementType 
+
+		returns type of element 
+
+			TEXT
+			IMAGE
+			TABLE
+			OTHER
+
+	text: None -> String 
+
+		if element's type is TEXT then returns text, throws TypeUnsupportedFeatureException otherwise 
+
+Page 
+
+	getElements: None -> Vector <Element> 
+		
+		returns vector of elements for a given page 
+
+UnboundPageIndexException 
+
+	Exception which is thrown when page index is unbound 
+
+class Document 
+
+	Document(filename : String) 
+		
+		Reads basic document informations from specified file 
+
+	pageCount: None -> Integer 
+
+		Returns page count of file, 0 if file is not specified or an error has occured 
+
+	getPage: Integer -> Page 
+
+		Returns specified page in document (first page has index 0) 
+
+		if index is less then 0 or grater then pageCount-1, throw an UnboundPageIndexException exception 
