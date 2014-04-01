@@ -5,8 +5,8 @@
 #include <map> 
 #include <string> 
 
-namespace PageProc {
-
+class Settings
+{
 private: 
 	
 	union value 
@@ -30,4 +30,5 @@ public:
 	int getInt(std::string str); 
 	std::string getStr(std::string str); 
 
-} // namespace PageProc
+};
+#endif // PAGEPROC_SETTINGS_HPP
