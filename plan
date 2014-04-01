@@ -1,47 +1,26 @@
-
-TypeUnsupportedFeatureException
-
-Element 
-
-	getMatPart: None -> struct matpart 
-
-		returns matpart structure for specified element 
-
-	type: None -> Element::ElementType 
-
-		returns type of element 
-
-			TEXT
-			IMAGE
-			TABLE
-			OTHER
-
-	text: None -> String 
-
-		if element's type is TEXT then returns text, throws TypeUnsupportedFeatureException otherwise 
+Document 
+	
+	Document: string -> void 
+	
+	page: int -> Page 
+	filename: void -> string 
+	qfile: void -> QFile // USE QT
 
 Page 
+	
+	process: Classificator & Segmentator 
 
-	getElements: None -> Vector <Element> 
-		
-		returns vector of elements for a given page 
+Segmentator: 
+	
+	getParts: void -> vector<MatPart> 
 
-UnboundPageIndexException 
+Classificator: 
+	
+	recognizeTable: MatPart -> bool 
+	recognizeText: MatPart -> bool 
+	recognizeDrawing: MatPart -> bool 
 
-	Exception which is thrown when page index is unbound 
+Settings: 
+	
+	values: map<myunion> 
 
-class Document 
-
-	Document(filename : String) 
-		
-		Reads basic document informations from specified file 
-
-	pageCount: None -> Integer 
-
-		Returns page count of file, 0 if file is not specified or an error has occured 
-
-	getPage: Integer -> Page 
-
-		Returns specified page in document (first page has index 0) 
-
-		if index is less then 0 or grater then pageCount-1, throw an UnboundPageIndexException exception 

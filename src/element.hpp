@@ -10,7 +10,6 @@
 #define ELEMENT_TYPE_DRAWING 2 
 #define ELEMENT_TYPE_UNKNOWN -1 
 
-
 /*
  * Class which represents element (text, table, ...)
  * */
@@ -47,5 +46,7 @@ public:
 	 * */
 	int elementType();
 };
+
+
 
 #endif // PAGEPROC_ELEMENT_HPP
