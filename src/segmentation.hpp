@@ -20,7 +20,7 @@
 #define PAGEPROC_SEGMENTATION_HPP
 
 #include <vector> 
-#include <core/core.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "matpart.hpp"
 

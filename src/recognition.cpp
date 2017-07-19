@@ -23,12 +23,11 @@
 
 #include <vector> 
 
-#include <imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 // debug
 #include <iostream>
 #include "debug.hpp"
-#include <highgui/highgui.hpp>
 
 using namespace std; 
 using namespace cv; 

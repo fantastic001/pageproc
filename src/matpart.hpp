@@ -19,7 +19,7 @@
 #ifndef PAGEPROC_MATPART_HPP
 #define PAGEPROC_MATPART_HPP
 
-#include <core/core.hpp>
+#include <opencv2/opencv.hpp>
 #include <vector> 
 #include <string> 
 

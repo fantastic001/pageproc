@@ -19,7 +19,7 @@
 #ifndef PAGEPROC_IMG_DEBUG_HPP
 #define PAGEPROC_IMG_DEBUG_HPP
 
-#include <core/core.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <vector>
 

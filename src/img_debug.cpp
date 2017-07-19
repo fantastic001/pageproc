@@ -18,8 +18,6 @@
 
 #include "img_debug.hpp"
 
-#include <highgui/highgui.hpp>
-
 #include <iostream>
 
 // avgRowSize(...)
@@ -29,6 +27,8 @@
 // debug 
 #include "recognition.hpp"
 
+
+#include <opencv2/opencv.hpp>
 using namespace cv; 
 using namespace std;
 

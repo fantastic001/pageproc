@@ -18,9 +18,10 @@
 
 #include "matpart.hpp"
 
-#include <highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
 
 using namespace cv; 
+using namespace std; 
 
 MatPart genMatPartFromMat(Mat m) 
 {
