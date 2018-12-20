@@ -23,11 +23,11 @@
 #include <iostream>
 
 // avgRowSize(...)
-#include "segmentation.hpp"
+#include "segmentators/segmentation.hpp"
 #include "debug.hpp"
 
 // debug 
-#include "recognition.hpp"
+#include "classificators/recognition.hpp"
 
 using namespace cv; 
 using namespace std;

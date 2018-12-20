@@ -45,6 +45,7 @@ public:
 	 * Returns: int - element typw (see constructor description for available types) 
 	 * */
 	int elementType();
+
 };
 
 
