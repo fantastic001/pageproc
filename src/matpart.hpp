@@ -2,7 +2,7 @@
 #ifndef PAGEPROC_MATPART_HPP 
 #define PAGEPROC_MATPART_HPP
 
-#include <core/core.hpp>
+#include <opencv2/core/core.hpp>
 #include <vector> 
 #include <string> 
 
