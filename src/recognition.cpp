@@ -292,7 +292,7 @@ bool recognizeDrawing(MatPart part)
 	threshold(part.mat, dst, 240, 255,  THRESH_BINARY_INV);
 
 	vector<vector<Point> > contours; 
-	findContours(dst, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	findContours(dst, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
 
 	// Find contour with more then 10 points and if it's found, then it is drawing because it is not text or table
 	bool found = false; 

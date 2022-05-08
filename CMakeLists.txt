@@ -1,11 +1,17 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.0)
 
 project (pageproc)
 
 enable_testing()
-
 find_package( OpenCV REQUIRED )
-link_libraries(${OpenCV_LIBS})
+
+# TODO: There are some issues with this approach where CMake requests too many unnecessary dependencies
+# find_package(VTK REQUIRED)
+# link_libraries(${OpenCV_LIBS} ${CLI11_LIBS})
+
+find_package(CLI11 REQUIRED)
+link_libraries(opencv_core opencv_highgui opencv_imgproc ${CLI11_LIBS})
+
 
 SET(core_source_files 
 	src/debug.cpp
