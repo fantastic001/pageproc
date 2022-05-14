@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.17)
 
 project (pageproc)
 
@@ -11,7 +11,7 @@ find_package( OpenCV REQUIRED )
 
 find_package(CLI11 REQUIRED)
 link_libraries(opencv_core opencv_highgui opencv_imgproc ${CLI11_LIBS})
-
+link_libraries(poppler-cpp)
 
 SET(core_source_files 
 	src/debug.cpp
@@ -22,13 +22,16 @@ SET(core_source_files
 	src/segmentation.cpp	
 )
 
-include_directories(
-	src/
-)
+
 
 add_library(pageproc SHARED 
 	${core_source_files}
 )
+target_include_directories(pageproc PUBLIC 
+	src/
+	${OpenCV_INCLUDE_DIRS}
+)
+
 
 add_executable(unittest 
 	${core_source_files}
@@ -36,10 +39,19 @@ add_executable(unittest
 )
 target_link_libraries(unittest boost_unit_test_framework)
 add_test(NAME unittest COMMAND unittest)
+target_include_directories(unittest PUBLIC 
+	src/
+	${OpenCV_INCLUDE_DIRS}
+)
 
 
 add_executable(pdfproc pdfproc.cpp)
 target_link_libraries(pdfproc pageproc)
+target_include_directories(pdfproc PUBLIC
+	src/
+	${OpenCV_INCLUDE_DIRS}
+)
+
 
 find_package(Python COMPONENTS Interpreter REQUIRED)
 
