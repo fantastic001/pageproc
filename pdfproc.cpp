@@ -40,7 +40,12 @@ void render_pages(poppler::document* document, string outputdir) {
     int index = 0;
     for (auto page : pages) {
         cout << "Rendering page " << index << endl;
-        poppler::page_renderer().render_page(page).save(outputdir + "/" + get_page_filename_by_index(index), "png", 500);
+        auto img = poppler::page_renderer().render_page(page);
+        img.save(outputdir + "/" + get_page_filename_by_index(index), "png", 500);
+        MatPart part;
+        part.height = img.height();
+        part.width = img.width();
+        divideIntoBlocks(part, DIVIDE_BY_COLUMNS);
         index++;
     }
     cout << "Rendering done\n";
