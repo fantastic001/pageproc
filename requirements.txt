@@ -1,0 +1,4 @@
+python-poppler
+numpy
+opencv-python 
+matplotlib
