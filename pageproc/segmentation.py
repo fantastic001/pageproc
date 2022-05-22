@@ -9,7 +9,10 @@ def get_numpy_array_from_img(image) -> np.array:
     return result
 
 def _binarize(arr: np.array) -> np.array:
-    return (arr[:, :, 0] + arr[:,:,1] + arr[:,:,2]) / 3.0
+    arr = arr.astype(int)
+    grayscale = (arr[:, :, 0] + arr[:,:,1] + arr[:,:,2]) / 3 
+    x =  (grayscale < 255).astype(int)
+    return x
 
 def get_cuts(hist, threshold=0.10):
     return np.diff((hist < threshold).astype(int))
@@ -20,6 +23,33 @@ def get_stops(cuts):
         i[cuts == -1],
         i[cuts == 1]
     )
+
+def xy_cut(sum: List[int], max_whitespace) -> List[int]:
+    # state = 1 we are on white area, state = 0 means we are on non-totally white area
+    state = 1 
+    c = 0 
+    result = [] 
+    if len(sum) == 0: return []
+    for i, p in enumerate(sum):
+        if p == 0 and state == 1: c += 1 
+        elif p == 1 and state == 0: c += 1 
+        elif p == 0 and state == 0: 
+            result.append(i-c)
+            result.append(i)
+            c = 1 
+            state = 1 
+        elif p == 1 and state == 1:
+            if c >= max_whitespace:
+                c = 1 
+                state = 0
+    for i, p in enumerate(sum[:7]):
+        if p == 1:
+            if 0 not in result: result.append(0)
+    if sum[-1] == 0: result.append(len(sum) - c)
+    result = sorted(result)
+    print(result)
+    return result 
+
 
 class PageSegment:
     def __init__(self, page, image, y=None, x=None, height=None, width=None, parent=None) -> None:
@@ -43,34 +73,34 @@ class PageSegment:
     
     def get_histogram(self, vertical=True) -> np.array:
         hist: np.array
-        kernel_size = 10
-        kernel = np.ones(kernel_size) / kernel_size
         if vertical:
-            hist = np.mean(_binarize(self.img), axis=1) / 255
+            hist = np.sum(_binarize(self.img), axis=1) > 0
         else:
-            hist = np.mean(_binarize(self.img), axis=0) / 255
-        return np.convolve(hist, kernel, mode="same")
+            hist = np.sum(_binarize(self.img), axis=0) > 0
+        hist = hist.astype(int)
+        # return np.convolve(hist, kernel, mode="same")
+        return hist 
 
-    def segment(self, vertical, threshold=0.30, deepdive=False):
-        starts, stops = get_stops(get_cuts(self.get_histogram(vertical=vertical), threshold=threshold))
-        if starts.shape[0] > stops.shape[0]:
-            starts = starts[:stops.shape[0]]
-        else:
-            stops = stops[:starts.shape[0]]
-        print(starts)
-        print(stops)
+    def segment(self, vertical, depth=0):
+        MAX_WHITESPACE_ROWS = 10
+        MAX_WHITESPACE_COLS = 15
+        sums = self.get_histogram(vertical=vertical)
+        # print("Sums: ", ", ".join([str(x) for x in sums]))
+        result = xy_cut(sums, MAX_WHITESPACE_ROWS if not vertical else MAX_WHITESPACE_COLS)
+        # print("Result for segment: ", result)
+
         children =  [
             PageSegment(
                 self.page, 
                 self.image, 
-                self.y if not vertical else start, 
-                self.x if vertical else start, 
+                self.y if not vertical else self.y + start, 
+                self.x if vertical else self.x + start, 
                 self.height if not vertical else stop-start,
                 self.width if vertical else stop-start,
                 self
-            ) for start, stop in zip(starts, stops)
+            ) for start, stop in zip(result[::2], result[1::2])
         ]
-        if not deepdive:
+        if depth == 0:
             return children
         else:
-            return list(itertools.chain(children, *[child.segment(not vertical, threshold+0.1, deepdive=True) for child in children]))
+            return list(itertools.chain(children, *[child.segment(not vertical, depth-1) for child in children]))

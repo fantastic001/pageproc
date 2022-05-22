@@ -31,7 +31,7 @@ def guess_type(segment):
 
 def segment(document, page_index, page, image, page_dir):
     segment = PageSegment(page, image)
-    segments = [segment] + segment.segment(True, 0.3, deepdive=True)
+    segments = [segment] + segment.segment(True)
     for i, s in enumerate(segments):
         imgpath = os.path.join(page_dir, "segment_%d.png" % i)
         PIL.Image.fromarray(s.img).save(imgpath, "PNG")
