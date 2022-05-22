@@ -31,16 +31,17 @@ def guess_type(segment):
 
 def segment(document, page_index, page, image, page_dir):
     segment = PageSegment(page, image)
-    segments = [segment] + segment.segment(True)
+    segments = [segment] + segment.segment(True, 1)
     for i, s in enumerate(segments):
         imgpath = os.path.join(page_dir, "segment_%d.png" % i)
-        PIL.Image.fromarray(s.img).save(imgpath, "PNG")
+        PIL.Image.fromarray(get_numpy_array_from_img(s.image)[s.y:s.y+s.height, s.x:s.x+s.width]).save(imgpath, "PNG")
     return {
-        "shape": segment.img.shape,
-        "segment_count": len(segments),
+        "height": segment.height,
+        "width": segment.width,
+        "segment_count": len(segments)-1,
         "segments": [
             {
-                "text": recognize_text(doc, page_index, s),
+                # "text": recognize_text(doc, page_index, s),
                 "x": int(s.x),
                 "y": int(s.y),
                 "width": int(s.width),
@@ -55,7 +56,9 @@ def segment(document, page_index, page, image, page_dir):
     
 doc = load_pdf(args.segment)
 num = 0 
-for page, image in load_pages(doc):
+pages = load_pages(doc)
+for page, image in pages:
+    print("\r  %d%% %s " % (num*100 // len(pages), "=" * (20*num // len(pages))), end="")
     page_dir = os.path.join(args.output, "page_%d" % num)
     os.makedirs(page_dir, exist_ok=True)
     image.save(os.path.join(page_dir, "%d.png" % num), "PNG")

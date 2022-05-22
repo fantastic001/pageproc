@@ -5,7 +5,7 @@ import numpy as np
 
 
 def get_numpy_array_from_img(image) -> np.array: 
-    result = np.array(image.memoryview(), dtype=np.uint8)
+    result = np.array(image.memoryview(), dtype=np.uint8, copy=False)
     return result
 
 def _binarize(arr: np.array) -> np.array:
@@ -13,16 +13,6 @@ def _binarize(arr: np.array) -> np.array:
     grayscale = (arr[:, :, 0] + arr[:,:,1] + arr[:,:,2]) / 3 
     x =  (grayscale < 255).astype(int)
     return x
-
-def get_cuts(hist, threshold=0.10):
-    return np.diff((hist < threshold).astype(int))
-
-def get_stops(cuts):
-    i = np.arange(cuts.shape[0])
-    return (
-        i[cuts == -1],
-        i[cuts == 1]
-    )
 
 def xy_cut(sum: List[int], max_whitespace) -> List[int]:
     # state = 1 we are on white area, state = 0 means we are on non-totally white area
@@ -47,48 +37,42 @@ def xy_cut(sum: List[int], max_whitespace) -> List[int]:
             if 0 not in result: result.append(0)
     if sum[-1] == 0: result.append(len(sum) - c)
     result = sorted(result)
-    print(result)
     return result 
 
 
 class PageSegment:
     def __init__(self, page, image, y=None, x=None, height=None, width=None, parent=None) -> None:
         self.image = image
-        self.img: np.array = get_numpy_array_from_img(image)
         if y is None:
             y = 0 
         if x is None:
             x = 0 
         if height is None:
-            height = self.img.shape[0]
+            height = self.image.height
         if width is None:
-            width = self.img.shape[1]
+            width = self.image.width
         self.page = page 
         self.x = x
         self.y = y 
         self.width = width
         self.height = height
-        self.img = self.img[y:y+height, x:x+width]
+        img: np.array = get_numpy_array_from_img(image)[y:y+height, x:x+width]
+        self.v_hist = np.sum(_binarize(img), axis=1) > 0
+        self.h_hist = np.sum(_binarize(img), axis=0) > 0
         self.parent = parent
     
     def get_histogram(self, vertical=True) -> np.array:
-        hist: np.array
         if vertical:
-            hist = np.sum(_binarize(self.img), axis=1) > 0
+            return self.v_hist.astype(int)
         else:
-            hist = np.sum(_binarize(self.img), axis=0) > 0
-        hist = hist.astype(int)
-        # return np.convolve(hist, kernel, mode="same")
-        return hist 
+            return self.h_hist.astype(int)
 
     def segment(self, vertical, depth=0):
         MAX_WHITESPACE_ROWS = 10
         MAX_WHITESPACE_COLS = 15
-        sums = self.get_histogram(vertical=vertical)
         # print("Sums: ", ", ".join([str(x) for x in sums]))
-        result = xy_cut(sums, MAX_WHITESPACE_ROWS if not vertical else MAX_WHITESPACE_COLS)
-        # print("Result for segment: ", result)
-
+        result = xy_cut(self.get_histogram(vertical=vertical), MAX_WHITESPACE_ROWS if not vertical else MAX_WHITESPACE_COLS)
+        # print("Result for segment: ", result)       
         children =  [
             PageSegment(
                 self.page, 
@@ -103,4 +87,8 @@ class PageSegment:
         if depth == 0:
             return children
         else:
-            return list(itertools.chain(children, *[child.segment(not vertical, depth-1) for child in children]))
+            result = children 
+            for child in children:
+                result.extend(child.segment(not vertical, depth-1))
+            return result 
+            # return list(itertools.chain(children, *[child.segment(not vertical, depth-1) for child in children]))
