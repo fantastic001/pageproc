@@ -2,3 +2,5 @@ python-poppler
 numpy
 opencv-python 
 matplotlib
+pandas
+sklearn
