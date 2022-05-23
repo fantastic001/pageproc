@@ -1,3 +1,4 @@
+from calendar import day_abbr
 import itertools
 import json
 import os
@@ -7,7 +8,7 @@ import importlib
 
 import pandas
 
-modes = ["train", "classify"] 
+modes = ["train", "classify", "label", "--help"] 
 
 
 arguments = [] 
@@ -22,6 +23,7 @@ subparsers = parser.add_subparsers(dest="mode")
 
 train_mode = subparsers.add_parser("train")
 classify_mode = subparsers.add_parser("classify")
+label_mode = subparsers.add_parser("label")
 
 train_mode.add_argument("--data-dir", action="store")
 train_mode.add_argument("--output", action="store")
@@ -31,35 +33,45 @@ train_mode.add_argument("--classifier", action="store", default="one_rule")
 classify_mode.add_argument("--data-dir", action="store")
 classify_mode.add_argument("--model", action="store")
 
+label_mode.add_argument("--preprocessor", default="simple", action="store")
+label_mode.add_argument("--data-dir", action="store")
+label_mode.add_argument("--exclude-attribute",nargs="*", default=[])
+
 args = parser.parse_args(arguments)
 
 
-def train_model(data_dir, output, preprocessor, classifier):
+def load(data_dir):
     pages = os.listdir(data_dir)
     df = pandas.DataFrame(itertools.chain(*[
         [dict(x, page=page) for x in json.loads(open(os.path.join(data_dir, page, "data.json")).read())["segments"]]
         for page in pages]))
-    print("Training samples: %d" % df.shape[0])
+    return df
+
+def preprocess(df, preprocessor) -> pandas.DataFrame:
     preprocess_module = importlib.import_module("segment_classify.preprocessors.%s" % preprocessor)
+    return preprocess_module.preprocess(df)
+
+
+
+def train_model(data_dir, output, preprocessor, classifier):
+    df = load(data_dir)
+    df = preprocess(df, preprocessor)
+    print("Training samples: %d" % df.shape[0])
     classifier_module = importlib.import_module("segment_classify.classifiers.%s" % classifier)
     open(output, "w").write(json.dumps({
         "preprocessor": preprocessor,
-        "model": classifier_module.train(preprocess_module.preprocess(df)),
+        "model": classifier_module.train(df),
         "classifier": classifier
     }))
 
 def classify_data(data_dir, model):
-    pages = os.listdir(data_dir)
-    df = pandas.DataFrame(itertools.chain(*[
-        [dict(x, page=page) for x in json.loads(open(os.path.join(data_dir, page, "data.json")).read())["segments"]]
-        for page in pages]))
     model_data = json.loads(open(model).read())
     model = model_data["model"]
     preprocessor = model_data["preprocessor"]
+    df = load(data_dir)
     classifier = model_data["classifier"]
-    preprocess_module = importlib.import_module("segment_classify.preprocessors.%s" % preprocessor)
     classifier_module = importlib.import_module("segment_classify.classifiers.%s" % classifier)
-    data = preprocess_module.preprocess(df)
+    data = preprocess(df, preprocessor)
     classified = classifier_module.load(model).predict(data)
     print(classified)
     print("Classified samples: %d" % len(classified))
@@ -78,3 +90,6 @@ if args.mode == "train":
 elif args.mode == "classify":
     print("Classification mode: ", args)
     classify_data(args.data_dir, args.model)
+elif args.mode == "label":
+    df = load(args.data_dir)
+    print(preprocess(df, args.preprocessor).drop(args.exclude_attribute, axis=1).to_csv())
