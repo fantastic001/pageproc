@@ -17,6 +17,8 @@ parser.add_argument("--output", action="store")
 parser.add_argument("--horizontal-whitespace-tolerance", action="store", default=15, type=int)
 parser.add_argument("--vertical-whitespace-tolerance", action="store", default=15, type=int)
 parser.add_argument("--leaf-only", action="store_true", default=False)
+parser.add_argument("--depth", action="store", default=1, type=int)
+
 
 
 args, rest = parser.parse_known_args(sys.argv)
@@ -37,7 +39,7 @@ def segment(document, page_index, page, image, page_dir):
     segment = PageSegment(page, image)
     segments = [segment] + segment.segment(
         vertical=True, 
-        depth=1, 
+        depth=args.depth, 
         vertical_whitespace_tolerance=args.vertical_whitespace_tolerance, 
         horizontal_whitespace_tolerance=args.horizontal_whitespace_tolerance,
         leaf_only=args.leaf_only
@@ -51,7 +53,7 @@ def segment(document, page_index, page, image, page_dir):
         "segment_count": len(segments)-1,
         "segments": [
             {
-                # "text": recognize_text(doc, page_index, s),
+                "text": recognize_text(doc, page_index, s),
                 "x": int(s.x),
                 "y": int(s.y),
                 "width": int(s.width),
