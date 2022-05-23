@@ -14,6 +14,10 @@ import matplotlib.pyplot as plt
 parser = argparse.ArgumentParser()
 parser.add_argument("--segment", action="store")
 parser.add_argument("--output", action="store")
+parser.add_argument("--horizontal-whitespace-tolerance", action="store", default=15, type=int)
+parser.add_argument("--vertical-whitespace-tolerance", action="store", default=15, type=int)
+parser.add_argument("--leaf-only", action="store_true", default=False)
+
 
 args, rest = parser.parse_known_args(sys.argv)
 print(args)
@@ -31,7 +35,13 @@ def guess_type(segment):
 
 def segment(document, page_index, page, image, page_dir):
     segment = PageSegment(page, image)
-    segments = [segment] + segment.segment(True, 1)
+    segments = [segment] + segment.segment(
+        vertical=True, 
+        depth=1, 
+        vertical_whitespace_tolerance=args.vertical_whitespace_tolerance, 
+        horizontal_whitespace_tolerance=args.horizontal_whitespace_tolerance,
+        leaf_only=args.leaf_only
+    )
     for i, s in enumerate(segments):
         imgpath = os.path.join(page_dir, "segment_%d.png" % i)
         PIL.Image.fromarray(get_numpy_array_from_img(s.image)[s.y:s.y+s.height, s.x:s.x+s.width]).save(imgpath, "PNG")

@@ -18,24 +18,33 @@ def xy_cut(sum: List[int], max_whitespace) -> List[int]:
     # state = 1 we are on white area, state = 0 means we are on non-totally white area
     state = 1 
     c = 0 
+    whitespace = 0
     result = [] 
     if len(sum) == 0: return []
     for i, p in enumerate(sum):
         if p == 0 and state == 1: c += 1 
-        elif p == 1 and state == 0: c += 1 
+        elif p == 1 and state == 0: 
+            c += 1
+            whitespace = 0
         elif p == 0 and state == 0: 
-            result.append(i-c)
-            result.append(i)
-            c = 1 
-            state = 1 
-        elif p == 1 and state == 1:
-            if c >= max_whitespace:
+            if whitespace >= max_whitespace:
+                result.append(i-c)
+                result.append(i)
                 c = 1 
-                state = 0
-    for i, p in enumerate(sum[:7]):
-        if p == 1:
-            if 0 not in result: result.append(0)
-    if sum[-1] == 0: result.append(len(sum) - c)
+                state = 1 
+            else:
+                c += 1
+                whitespace += 1
+        elif p == 1 and state == 1:
+            c = 1 
+            state = 0
+            whitespace = 0
+    # for i, p in enumerate(sum[:7]):
+    #     if p == 1:
+    #         if 0 not in result: result.append(0)
+    if sum[-1] == 0 and state == 0: 
+        result.append(len(sum) - c)
+        result.append(len(sum))
     result = sorted(result)
     return result 
 
@@ -67,9 +76,9 @@ class PageSegment:
         else:
             return self.h_hist.astype(int)
 
-    def segment(self, vertical, depth=0):
-        MAX_WHITESPACE_ROWS = 10
-        MAX_WHITESPACE_COLS = 15
+    def segment(self, vertical, depth=0, vertical_whitespace_tolerance=10, horizontal_whitespace_tolerance=15, leaf_only=False):
+        MAX_WHITESPACE_ROWS = vertical_whitespace_tolerance
+        MAX_WHITESPACE_COLS = horizontal_whitespace_tolerance
         # print("Sums: ", ", ".join([str(x) for x in sums]))
         result = xy_cut(self.get_histogram(vertical=vertical), MAX_WHITESPACE_ROWS if not vertical else MAX_WHITESPACE_COLS)
         # print("Result for segment: ", result)       
@@ -87,8 +96,14 @@ class PageSegment:
         if depth == 0:
             return children
         else:
-            result = children 
-            for child in children:
-                result.extend(child.segment(not vertical, depth-1))
-            return result 
-            # return list(itertools.chain(children, *[child.segment(not vertical, depth-1) for child in children]))
+            CC = [child.segment(
+                    not vertical, 
+                    depth-1, 
+                    vertical_whitespace_tolerance, 
+                    horizontal_whitespace_tolerance, 
+                    leaf_only
+                ) for child in children]
+            if leaf_only:
+                return list(itertools.chain(*CC))
+            else:
+                return list(itertools.chain(children, *CC))
