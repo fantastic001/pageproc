@@ -47,15 +47,15 @@ def load(data_dir):
         for page in pages]))
     return df
 
-def preprocess(df, preprocessor) -> pandas.DataFrame:
+def preprocess(df, preprocessor, datadir) -> pandas.DataFrame:
     preprocess_module = importlib.import_module("segment_classify.preprocessors.%s" % preprocessor)
-    return preprocess_module.preprocess(df)
+    return preprocess_module.preprocess(df, datadir)
 
 
 
 def train_model(data_dir, output, preprocessor, classifier):
     df = load(data_dir)
-    df = preprocess(df, preprocessor)
+    df = preprocess(df, preprocessor, data_dir)
     print("Training samples: %d" % df.shape[0])
     classifier_module = importlib.import_module("segment_classify.classifiers.%s" % classifier)
     open(output, "w").write(json.dumps({
@@ -71,7 +71,7 @@ def classify_data(data_dir, model):
     df = load(data_dir)
     classifier = model_data["classifier"]
     classifier_module = importlib.import_module("segment_classify.classifiers.%s" % classifier)
-    data = preprocess(df, preprocessor)
+    data = preprocess(df, preprocessor, data_dir)
     classified = classifier_module.load(model).predict(data)
     print(classified)
     print("Classified samples: %d" % len(classified))
@@ -92,4 +92,4 @@ elif args.mode == "classify":
     classify_data(args.data_dir, args.model)
 elif args.mode == "label":
     df = load(args.data_dir)
-    print(preprocess(df, args.preprocessor).drop(args.exclude_attribute, axis=1).to_csv())
+    print(preprocess(df, args.preprocessor, args.data_dir).drop(args.exclude_attribute, axis=1).to_csv())

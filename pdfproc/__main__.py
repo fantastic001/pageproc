@@ -75,5 +75,5 @@ for page, image in pages:
     os.makedirs(page_dir, exist_ok=True)
     image.save(os.path.join(page_dir, "%d.png" % num), "PNG")
     with open(os.path.join(page_dir, "data.json"), "w") as f:
-        f.write(json.dumps(segment(doc, num, page, image, page_dir)))
+        f.write(json.dumps(segment(doc, num, page, image, page_dir), indent=5, sort_keys=True))
     num += 1 

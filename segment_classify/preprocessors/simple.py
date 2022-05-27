@@ -1,5 +1,5 @@
 
 import pandas as pd 
 
-def preprocess(df: pd.DataFrame):
+def preprocess(df: pd.DataFrame, datadir):
     return df 
