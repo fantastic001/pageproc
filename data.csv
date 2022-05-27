@@ -1,4 +1,4 @@
-,height,id,img_path,parent_id,type_guess,width,x,y,page,area,width_to_area,height_to_width,mean
+index,height,id,img_path,parent_id,type_guess,width,x,y,page,area,width_to_area,height_to_width,mean
 0,3508,0,segment_0.png,,dummy,2480,0,0,page_9,8699840,0.000285062713797035,1.41451612903226,224.529220575704
 1,750,1,segment_1.png,,image,932,300,346,page_9,699000,0.00133333333333333,0.804721030042919,104.220838340486
 2,737,2,segment_2.png,,image,933,1264,359,page_9,687621,0.00135685210312076,0.789924973204716,104.347772973775
