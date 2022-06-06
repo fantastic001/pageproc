@@ -5,6 +5,7 @@ import os
 import sys 
 import argparse 
 import importlib
+import inspect
 
 import pandas
 
@@ -40,6 +41,12 @@ label_mode.add_argument("--exclude-attribute",nargs="*", default=[])
 args = parser.parse_args(arguments)
 
 
+def load_preprocessor_module(preprocessor):
+    return importlib.import_module("segment_classify.preprocessors.%s" % preprocessor)
+
+def load_classifier_module(classifier):
+    return importlib.import_module("segment_classify.classifiers.%s" % classifier)
+
 def load(data_dir):
     pages = os.listdir(data_dir)
     df = pandas.DataFrame(itertools.chain(*[
@@ -47,9 +54,21 @@ def load(data_dir):
         for page in pages]))
     return df
 
+def bind_parameters_from_env(f, prefix: str):
+    params = {}
+    sig = inspect.signature(f)
+    for name, p in sig.parameters.items():
+        ptype = type(p.default)
+        if ptype != type:
+            params[name] = ptype(os.environ.get("%s_%s" % (prefix.upper(), name.upper()), p.default))
+    return params
+
 def preprocess(df, preprocessor, datadir) -> pandas.DataFrame:
-    preprocess_module = importlib.import_module("segment_classify.preprocessors.%s" % preprocessor)
-    return preprocess_module.preprocess(df, datadir)
+    preprocess_module = load_preprocessor_module(preprocessor)
+    f = preprocess_module.preprocess
+    params = bind_parameters_from_env(f, "preprocess")
+    print(params)
+    return f(df, datadir, **params)
 
 
 
@@ -57,10 +76,10 @@ def train_model(data_dir, output, preprocessor, classifier):
     df = load(data_dir)
     df = preprocess(df, preprocessor, data_dir)
     print("Training samples: %d" % df.shape[0])
-    classifier_module = importlib.import_module("segment_classify.classifiers.%s" % classifier)
+    classifier_module = load_classifier_module(classifier)
     open(output, "w").write(json.dumps({
         "preprocessor": preprocessor,
-        "model": classifier_module.train(df),
+        "model": classifier_module.train(df, **bind_parameters_from_env(classifier_module.train, "model")),
         "classifier": classifier
     }))
 
@@ -70,7 +89,7 @@ def classify_data(data_dir, model):
     preprocessor = model_data["preprocessor"]
     df = load(data_dir)
     classifier = model_data["classifier"]
-    classifier_module = importlib.import_module("segment_classify.classifiers.%s" % classifier)
+    classifier_module = load_classifier_module(classifier)
     data = preprocess(df, preprocessor, data_dir)
     classified = classifier_module.load(model).predict(data)
     print(classified)

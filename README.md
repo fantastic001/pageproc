@@ -64,5 +64,5 @@ To extract and add bibliography for particular documents:
 Tools support the following options to change:
 
 * segmentation behaviour and thresholds for `pdfproc`
-* ML model to be trained and used for `segment_classify` along with special model parameters
+* ML model to be trained and used for `segment_classify` along with special model parameters given as `PREPROCESS_*` and `MODEL_*` envvars
 * Model for `bib_extract`
