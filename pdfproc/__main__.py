@@ -53,7 +53,7 @@ def segment(document, page_index, page, image, page_dir):
         "segment_count": len(segments)-1,
         "segments": [
             {
-                "text": recognize_text(doc, page_index, s),
+                "text": recognize_text(args.segment, page_index, s),
                 "x": int(s.x),
                 "y": int(s.y),
                 "width": int(s.width),
