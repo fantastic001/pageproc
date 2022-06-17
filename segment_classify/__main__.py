@@ -9,7 +9,7 @@ import inspect
 
 import pandas
 
-modes = ["train", "classify", "label", "--help", "assign"] 
+modes = ["train", "classify", "label", "--help", "assign", "score"] 
 
 
 arguments = [] 
@@ -26,6 +26,8 @@ train_mode = subparsers.add_parser("train")
 classify_mode = subparsers.add_parser("classify")
 label_mode = subparsers.add_parser("label")
 assign_mode = subparsers.add_parser("assign")
+score_mode = subparsers.add_parser("score")
+
 
 train_mode.add_argument("--data-dir", action="store")
 train_mode.add_argument("--output", action="store")
@@ -43,6 +45,10 @@ assign_mode.add_argument("--data", action="store", help="Path to directory where
 assign_mode.add_argument("--csv", action="store", help="Path to CSV file where types are stored")
 assign_mode.add_argument("--source", default="type_guess", help="Field inside CSV file representing column as source for types")
 assign_mode.add_argument("--target", default="type_guess", help="Field inside JSON file representing target for types")
+
+score_mode.add_argument("--data-dir", action="store")
+score_mode.add_argument("--expected", action="store", default="type_guess")
+score_mode.add_argument("--predicted", action="store", default="type")
 
 args = parser.parse_args(arguments)
 
@@ -129,3 +135,6 @@ elif args.mode == "assign":
         with open(os.path.join(data_dir, page_id, "data.json"), "w") as f:
             f.write(json.dumps(data, indent=3))
     csv.apply(lambda x: change_type(x["page"], x["img_path"], x[args.target]), 1)
+elif args.mode == "score":
+    data = load(args.data_dir)
+    print("Accuracy: %0.2f%%" % (100*data[data[args.expected] == data[args.predicted]].count().id / data.count().id))

@@ -5,3 +5,6 @@ python -m pdfproc --segment "/home/stefan/data/Documents/Library/Papers/Computer
 # Assign proper labels 
 python -m segment_classify assign --csv data.csv --data data/
 
+# python -m segment_classify train --data-dir data --output model.json --classifier neural_network
+# python -m segment_classify classify --data-dir data --model model.json
+# python -m segment_classify score --data-dir data/
