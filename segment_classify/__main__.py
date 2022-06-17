@@ -9,7 +9,7 @@ import inspect
 
 import pandas
 
-modes = ["train", "classify", "label", "--help"] 
+modes = ["train", "classify", "label", "--help", "assign"] 
 
 
 arguments = [] 
@@ -25,6 +25,7 @@ subparsers = parser.add_subparsers(dest="mode")
 train_mode = subparsers.add_parser("train")
 classify_mode = subparsers.add_parser("classify")
 label_mode = subparsers.add_parser("label")
+assign_mode = subparsers.add_parser("assign")
 
 train_mode.add_argument("--data-dir", action="store")
 train_mode.add_argument("--output", action="store")
@@ -37,6 +38,11 @@ classify_mode.add_argument("--model", action="store")
 label_mode.add_argument("--preprocessor", default="simple", action="store")
 label_mode.add_argument("--data-dir", action="store")
 label_mode.add_argument("--exclude-attribute",nargs="*", default=[])
+
+assign_mode.add_argument("--data", action="store", help="Path to directory where data is")
+assign_mode.add_argument("--csv", action="store", help="Path to CSV file where types are stored")
+assign_mode.add_argument("--source", default="type_guess", help="Field inside CSV file representing column as source for types")
+assign_mode.add_argument("--target", default="type_guess", help="Field inside JSON file representing target for types")
 
 args = parser.parse_args(arguments)
 
@@ -112,3 +118,14 @@ elif args.mode == "classify":
 elif args.mode == "label":
     df = load(args.data_dir)
     print(preprocess(df, args.preprocessor, args.data_dir).drop(args.exclude_attribute, axis=1).to_csv())
+elif args.mode == "assign":
+    csv = pandas.read_csv(args.csv)
+    data_dir = args.data
+    def change_type(page_id, img_path, newtype):
+        data = {}
+        with open(os.path.join(data_dir, page_id, "data.json")) as f:
+            data = json.loads(f.read())
+        data["segments"][[x["img_path"] for x in data["segments"]].index(img_path)][args.target] = newtype
+        with open(os.path.join(data_dir, page_id, "data.json"), "w") as f:
+            f.write(json.dumps(data, indent=3))
+    csv.apply(lambda x: change_type(x["page"], x["img_path"], x[args.target]), 1)
