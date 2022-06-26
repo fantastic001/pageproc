@@ -27,4 +27,4 @@ def preprocess(df: pd.DataFrame, datadir):
         column = "%d" % c
         df[column] = img.map(partial(get_pixel_columns, i=c))
         columns.append(column)
-    return df[["id", "page", *columns]]
+    return df[["id", "page", "type_guess", 'img_path', 'text', 'parent_id', *columns]]
