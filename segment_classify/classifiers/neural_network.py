@@ -15,8 +15,7 @@ def deserialize_model(data: str):
 
 class MyNN(MLPClassifier):
     def predict(self, X):
-        X["type"] = ""
-        X["type_guess"] = ""
+        X["type"] = X["type_guess"]
         return super().predict(X.drop(DROP_COLS, axis=1))
 
 def train(df: pd.DataFrame):
