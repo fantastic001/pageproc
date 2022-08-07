@@ -66,3 +66,25 @@ Tools support the following options to change:
 * segmentation behaviour and thresholds for `pdfproc`
 * ML model to be trained and used for `segment_classify` along with special model parameters given as `PREPROCESS_*` and `MODEL_*` envvars
 * Model for `bib_extract`
+
+
+# Development and testing of models 
+
+To setup development env and run model tests first create virtualenv:
+
+    virtualenv env
+    . env/bin/activate
+    pip install -r requirements.txt
+
+For testing, there is one paper which is used and for which there are pre-labeled data to score accuracy of model. 
+
+Please download J. Olsen - Realtime procedural terrain generation (2004) paper and save it on your local machine. 
+
+After saving it, export env ariable to its path:
+
+    export SAMPLE_PDF=/path/to/paper/pdf.pdf
+
+Run all tests and generate reports:
+
+    ./bin/testAll.sh sample_configurations/ reports
+

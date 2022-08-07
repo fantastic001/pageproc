@@ -14,7 +14,7 @@ INVOCATION_ID=$(date +%s)
 WORKDIR=$THIS_DIR/work-$INVOCATION_ID
 
 mkdir $WORKDIR
-SAMPLE_PDF="/home/stefan/data/Documents/Library/Papers/Computer Science/Computer graphics/J. Olsen - Realtime procedural terrain generation (2004).pdf"
+SAMPLE_PDF=${SAMPLE_PDF:-"/home/stefan/data/Documents/Library/Papers/Computer Science/Computer graphics/J. Olsen - Realtime procedural terrain generation (2004).pdf"}
 BASE_SEGMENTS=$WORKDIR/data 
 TRAINING_DIR=$WORKDIR/training-data 
 TEST_DIR=$WORKDIR/test-data 
