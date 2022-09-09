@@ -1,4 +1,5 @@
 python-poppler
+tabulate
 numpy
 opencv-python 
 matplotlib
