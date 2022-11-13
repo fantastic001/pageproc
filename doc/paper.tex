@@ -34,7 +34,7 @@
 
 \begin{abstract}
     U ovom radu je implementiran i evaluiran sistem za segmentaciju i klasifikaciju elemenata stranice dokumenta. 
-	Dobijeni rezultati pokazuju da vektor koji sadrži atrbiute, poput odnosa širine i 
+	Dobijeni rezultati pokazuju da vektor koji sadrži atribute, poput odnosa širine i 
 	dužine dela stranice, bilo dovoljno proslediti kao ulaz random decision
     forest klasifikatoru, da bi se dobila tačnost od 72\% pri klasifikaciji elemenata stranice. 
 	Takođe je prikazan i algoritam koji vrši hijerarhijsko segmentiranje stranice u stablo.     
@@ -50,12 +50,12 @@
 
 Optičko prepoznavanje karaktera (eng. OCR - Optical Character Recognition) igra važnu ulogu u današnje vreme kao način pretvaranja fizičkih dokumenata u digitalne \cite{mori1999optical}.
 Međutim, pre samog prepoznavanja karaktera, dokumenti imaju specifičnu strukturu u smislu organizacije elemenata na stranici. Na primer, naučni radovi su često
-organizovani tako da svaka stranica ima dve kolone gde na prvoj postoji i naslov koji se širi preko cele stranice po širini. Zbog ovoga je potrebno uraditi određene korake za preprocesiranje
+organizovani tako da svaka stranica ima dve kolone, gde na prvoj postoji i naslov koji se širi preko cele stranice po širini. Zbog ovoga je potrebno uraditi određene korake za preprocesiranje
 pre samog prepoznavanja teksta kako bi se elementi izdvojili na stranici. Koraci za preprocesiranje obuhvataju segmentaciju dokumenta i klasifikaciju delova stranice u određene klase. 
-Na stranicama, pored teksta, se često mogu pronaći i drugi elementi poput tabela, slika, itd.
+Na stranicama, pored teksta, često se mogu pronaći i drugi elementi poput tabela, slika, itd.
 Sam tekst može biti napisan i različitim stilom i samim tim nosi različito semantičko značenje. Primer ovoga je naslov sekcije kojeg je potrebno posmatrati
 drugačije od paragrafa unutar sekcije jer sam naslov predstavlja neku semantičku celinu. 
-Kao posledica ovakvog organizovanja dokumenata se javlja potreba za segmentacijom stranice, odnosno izdvajanje i kreiranje hijerarhijske strukture stranice kao i
+Kao posledica ovakvog organizovanja dokumenata se javlja potreba za segmentacijom stranice, odnosno izdvajanje i kreiranje hijerarhijske strukture njenih delova kao i
 klasifikacija svakog segmentiranog dela u određene klase.
 
 U ovom radu je implementirana segmentacija elemenata stranice tako da se dobije hijerarhijska struktura, a potom je svaki element klasifikovan u predefinisane kategorije
@@ -112,7 +112,7 @@ Klasa dokumenta je klasa iz predefinisanog skupa mogućih klasa i to $$ k \in \{
 \label{sec:org7eee69b}
 
 Za segmentaciju je korišćen \textit{xy-cuts} algoritam \cite{ha1995recursive}. Algoritam radi hijerarhijsko segmentiranje dokumenta na sledeći način. Neka $$ e = (x,y,w,h) $$ predstavlja određeni
-deo dokumenta. Algoritam za dati element izbacuje elemente $$ e_1, ..., e_l $$ za koje važi $ p(e_i) = e, 1 \le i \le l $. U slučaju semgentiranja stranice, kreće se od same stranice kao korenskog elementa
+deo dokumenta. Algoritam za dati element izbacuje elemente $$ e_1, ..., e_l $$ za koje važi $ p(e_i) = e, 1 \le i \le l $. U slučaju segmentiranja stranice, kreće se od same stranice kao korenskog elementa
 stabla i stranica se rekurzivno deli na manje delove po postupku datom u kodu 1.
 
 
@@ -168,12 +168,12 @@ Algorithm xy-cuts(P: stranica, E = (x,y,h,w), metod)
 	\caption{Algoritam za segmentaciju stranice}
 \end{program}
 
-Algoritam izračunava na kojim mestima je potrebno izdeliti element kako bi se dobili manji elementi. Postoje dva načina po kojima on može da podeli element, a to je
-vertikalno i horzontalno. Mesta gde se vrši podela jesu ona mesta gde ima mnogo belih piksela, odnosno kada je suma crnih piksela u datom redu (za vertikalno presecanje)
+Algoritam izračunava na kojim mestima je potrebno podeliti element kako bi se dobili manji elementi. Postoje dva načina po kojima on može da podeli element, a to je
+vertikalno i horizontalno. Mesta gde se vrši podela jesu ona mesta gde ima mnogo belih piksela, odnosno kada je suma crnih piksela u datom redu (za vertikalno presecanje)
 ili u datoj koloni (za horizontalno presecanje) jednaka nuli.
 
 Nakon ovog algoritma, moguće je element podeliti na manje tako što se uzmu podelementi takvi da su presecanja njihove granice. Algoritam se ponavlja rekurzivno
-sa obrnutim metodom, odnosno ako je metod dobijenih podelemenata bio VERTIKALNO onda se algoritam poziva rekurzivno za svaki podelement sa metodom HORIZONTALNO
+sa suprotnim pravcem presecanja, odnosno ako je pravac dobijenih podelemenata bio VERTIKALNO onda se algoritam poziva rekurzivno za svaki podelement sa pravcem HORIZONTALNO
 i obrnuto. 
 
 \subsection{Klasifikacija elemenata}
