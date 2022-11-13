@@ -24,7 +24,7 @@
 
 
 \floatstyle{ruled}
-\newfloat{program}{tbp}{}
+\newfloat{program}{p}{}
 \floatname{program}{Kod}
 
 \begin{document}
@@ -33,9 +33,11 @@
 \author{Stefan Nožinić, Univerzitet u Novom Sadu. Mentor: miloš Radovanović}
 
 \begin{abstract}
-    U ovom radu je implementiran i evaluiran sistem za segmentaciju i klasifikaciju elemenata stranice dokumenta. Dobijeni rezultati pokazuju da je
-    bilo dovoljno jednostavno enkodiranje elemenata u vektor koji sadrži odnose globalnih atributa elementa a potom dati enkodirani vektor proslediti kao ulaz random decision
-    forest klasifikatoru da bi se dobila tačnost od 72\%. Takođe je prikazan i algoritam koji vrši hijerarhijsko segmentiranje stranice u stablo.     
+    U ovom radu je implementiran i evaluiran sistem za segmentaciju i klasifikaciju elemenata stranice dokumenta. 
+	Dobijeni rezultati pokazuju da vektor koji sadrži atrbiute, poput odnosa širine i 
+	dužine dela stranice, bilo dovoljno proslediti kao ulaz random decision
+    forest klasifikatoru, da bi se dobila tačnost od 72\% pri klasifikaciji elemenata stranice. 
+	Takođe je prikazan i algoritam koji vrši hijerarhijsko segmentiranje stranice u stablo.     
 \end{abstract}
 
 
@@ -48,21 +50,22 @@
 
 Optičko prepoznavanje karaktera (eng. OCR - Optical Character Recognition) igra važnu ulogu u današnje vreme kao način pretvaranja fizičkih dokumenata u digitalne \cite{mori1999optical}.
 Međutim, pre samog prepoznavanja karaktera, dokumenti imaju specifičnu strukturu u smislu organizacije elemenata na stranici. Na primer, naučni radovi su često
-organizovani tako da svaka stranica ima dve kolone gde na prvoj postoji i naslov koji se širi preko cele stranice po širini. Zbog ovoga je potrebno uraditi korake
-pre samog prepoznavanja teksta kako bi se elementi izdvojili na stranici. Na stranicama, pored teksta, se često mogu pronaći i drugi elementi poput tabela, slika, itd.
+organizovani tako da svaka stranica ima dve kolone gde na prvoj postoji i naslov koji se širi preko cele stranice po širini. Zbog ovoga je potrebno uraditi određene korake za preprocesiranje
+pre samog prepoznavanja teksta kako bi se elementi izdvojili na stranici. Koraci za preprocesiranje obuhvataju segmentaciju dokumenta i klasifikaciju delova stranice u određene klase. 
+Na stranicama, pored teksta, se često mogu pronaći i drugi elementi poput tabela, slika, itd.
 Sam tekst može biti napisan i različitim stilom i samim tim nosi različito semantičko značenje. Primer ovoga je naslov sekcije kojeg je potrebno posmatrati
 drugačije od paragrafa unutar sekcije jer sam naslov predstavlja neku semantičku celinu. 
 Kao posledica ovakvog organizovanja dokumenata se javlja potreba za segmentacijom stranice, odnosno izdvajanje i kreiranje hijerarhijske strukture stranice kao i
 klasifikacija svakog segmentiranog dela u određene klase.
 
-U ovom radu je implementirana segmentacija elemenata stranice tako da se dobije hijerarhijska struktura a potom je svaki element klasifikovan u predefinisane kategorije
+U ovom radu je implementirana segmentacija elemenata stranice tako da se dobije hijerarhijska struktura, a potom je svaki element klasifikovan u predefinisane kategorije
 kao što su: slika, naslov, paragraf, listing, tabela itd.
 
 U sekciji 2 je dat pregled korišćenih metoda i to izdvojenih u podsekcije gde se u sekcijama 2.1 i 2.2 opisuje ulaz i izlaz samog sistema i uvode strukture koje su
-koriščene. U sekciji 2.3 je opisana metoda segmentacije dok u sekciji 2.4 su opisane metode klasifikacije elemenata. U sekciji 2.5 su dati implementacioni detalji
+koriščene. U sekciji 2.3 je opisana metoda segmentacije, dok u sekciji 2.4 su opisane metode klasifikacije elemenata. U sekciji 2.5 su dati implementacioni detalji
 u smislu korišćenih tehnologija.
 
-U sekciji 3 je dat regled rezultata opisanih metoda kao i diskusija rezultata u smislu njihovog praktičnog značaja.
+U sekciji 3 je dat pregled rezultata opisanih metoda kao i diskusija rezultata u smislu njihovog praktičnog značaja.
 
 U sekciji 4 je dat zaključak kao i predlozi za buduće radove.
 
@@ -75,11 +78,11 @@ Sekcija 5 daje pregled literature koja je korišćena.
 \subsection{Ulazni podaci}
 \label{sec:org36199a1}
 
-Dokument je lista stranica gde je svaka stranica P predstavljena kao slika odnosno matrica piksela. Ovo je moguće uraditi procesom skenirana ručno napisanog dokumenta, 
+Dokument je lista stranica gde je svaka stranica P predstavljena kao slika, odnosno matrica piksela. Ovo je moguće uraditi procesom skeniranja ručno napisanog dokumenta, 
 ili procesom renderovanja PDF dokumenata uz pomoć postojećih alata kao što je Poppler \cite{poppler}.
 
 Dakle dokument se može posmatrati kao sekvenca slika njegovih stranica $$ D = (P_1, P_2, ..., P_n) $$ gde je $$ 0 \le P_{i}(x,y, c) \le 1$$ vrednost piksela na i-toj
-stranici na poziciji (x,y) na kanalu c (slika je u RBG formatu boja odnosno c je element skupa \{R, G, B\}).
+stranici na poziciji (x,y) na kanalu c (slika je u RBG formatu boja, odnosno c je element skupa \{R, G, B\}).
 
 Segmentacija i klasifikacija se radi na svakoj stranici izolovano, odnosno rezultati segmentacije i klasifikacije na i-toj stranici su nezavisni od rezultata na j-toj
 stranici.
@@ -98,8 +101,8 @@ Izlaz sistema je skup elemenata gde je svaki element uređena torka (x,y,w,h,k) 
 \item k je klasa elementa dobijena od strane klasifikatora
 \end{itemize}
 
-Pored ovog skupa, izlaz je i funkcija $$ p : A \to A $$ koja određuje hijerarhijski raspored elemenata kao stabla gde za element x važi da je
-deo elementa p(x). 
+Pored ovog skupa, izlaz je i funkcija $$ p : A \to A $$ koja određuje hijerarhijski raspored elemenata u stablu, gde za element $ x $ važi da se
+sadrži u elementu $ p(x) $. 
 
 Klasa dokumenta je klasa iz predefinisanog skupa mogućih klasa i to $$ k \in \{\text{NONE}, \text{IMAGE}, \text{TEXT}, \text{FORMULA}, \text{HEADING}, \text{LISTING}, \text{TABLE}\} $$ 
 
@@ -108,75 +111,66 @@ Klasa dokumenta je klasa iz predefinisanog skupa mogućih klasa i to $$ k \in \{
 \subsection{Segmentacija}
 \label{sec:org7eee69b}
 
-Za segmentaciju je koriščen xy-cuts algoritam \cite{ha1995recursive}. Algoritam radi hijerarhijsko segmentiranje dokumenta na sledeći način. Neka $$ e = (x,y,w,h) $$ predstavlja određeni
-deo dokumenta. Algoritam za dati element izbacuje elemente $$ e_1, ..., e_l $$ za koje važi $$ p(e_i) = e, 1 \le i \le l $$. U slučaju semgentiranja stranice, kreće se od same stranice kao korenskog elementa
-stabla i stranica se rekurzivno deli na manje delove po sledećem postupku:
+Za segmentaciju je korišćen \textit{xy-cuts} algoritam \cite{ha1995recursive}. Algoritam radi hijerarhijsko segmentiranje dokumenta na sledeći način. Neka $$ e = (x,y,w,h) $$ predstavlja određeni
+deo dokumenta. Algoritam za dati element izbacuje elemente $$ e_1, ..., e_l $$ za koje važi $ p(e_i) = e, 1 \le i \le l $. U slučaju semgentiranja stranice, kreće se od same stranice kao korenskog elementa
+stabla i stranica se rekurzivno deli na manje delove po postupku datom u kodu 1.
 
 
 \begin{program}
 	\begin{CodeListing}
-		Algorithm xy-cuts(P: stranica, E = (x,y,h,w), metod)
-			neka je grayscale varijanta 
-				P(x,y) = (P(x,y,R) + P(x,y,G), P(x,y,B)) / 3 
-			B = P
-			for x from E.h to E.y + E.h do
-				for y from E.y to E.x + E.w do
-					B[x,y] = 1 if E[x,y] > 0.5 else 0 
-			metod je iz skupa \{VERTIKALNO, HORIZONTALNO\}
-			suma[i] = 0 for i s.t. 0 <= i <= max(P.h, P.w)
-			start = 0 
-			if metod == VERTIKALNO then 
-				start = E.y
-				for y from E.y to E.y+E.h do
-					suma[y] = 0
-					for x from E.x to E.x + E.w do
-						suma[y] += P[x,y]
-					if suma[y] > 0 then
-						suma[y] = 1
+Algorithm xy-cuts(P: stranica, E = (x,y,h,w), metod)
+	neka je grayscale varijanta 
+		P(x,y) = (P(x,y,R) + P(x,y,G), P(x,y,B)) / 3 
+	B = P
+	for x from E.h to E.y + E.h do
+		for y from E.y to E.x + E.w do
+			B[x,y] = 1 if E[x,y] > 0.5 else 0 
+	metod je iz skupa \{VERTIKALNO, HORIZONTALNO\}
+	suma[i] = 0 for i s.t. 0 <= i <= max(P.h, P.w)
+	start = 0 
+	if metod == VERTIKALNO then 
+		start = E.y
+		for y from E.y to E.y+E.h do
+			suma[y] = 0
+			for x from E.x to E.x + E.w do
+				suma[y] += P[x,y]
+			if suma[y] > 0 then suma[y] = 1
+	else
+		start = E.x
+		for x from E.x to E.x+E.w do
+			suma[x] = 0
+			for y from E.y to E.y + E.h do
+				suma[x] += P[x,y]
+			if suma[x] > 0 then suma[x] = 1
+	state = 1, c = 0, whitespace = 0
+	result = []
+	if suma.length = 0 then return []
+	for i from start to suma.length do
+		p = suma[i]
+		if p == 0 and state == 1 then c += 1 
+		elif p == 1 and state == 0 then 
+			c += 1, whitespace = 0
+		elif p == 0 and state == 0 then 
+			if whitespace >= max_whitespace then 
+				result.add(i-c)
+				result.add(i)
+				c = 1, state = 1 
 			else
-				start = E.x
-				for x from E.x to E.x+E.w do
-					suma[x] = 0
-					for y from E.y to E.y + E.h do
-						suma[x] += P[x,y]
-					if suma[x] > 0 then
-						suma[x] = 1
-			state = 1
-			c = 0
-			whitespace = 0
-			result = []
-			if suma.length = 0 then return []
-			for i from start to suma.length do
-				p = suma[i]
-				if p == 0 and state == 1 then c += 1 
-				elif p == 1 and state == 0 then 
-					c += 1
-					whitespace = 0
-				elif p == 0 and state == 0 then 
-					if whitespace >= max_whitespace then 
-						result.add(i-c)
-						result.add(i)
-						c = 1 
-						state = 1 
-					else
-						c += 1
-						whitespace += 1
-				elif p == 1 and state == 1 then 
-					c = 1 
-					state = 0
-					whitespace = 0
-			if suma[suma.length-1] == 0 and state == 0 then 
-				result.add(suma.length - c)
-				result.add(suma.length)
-			sort(result)
-			return result 
+				c += 1, whitespace += 1
+		elif p == 1 and state == 1 then 
+			c = 1, state = 0, whitespace = 0
+	if suma[suma.length-1] == 0 and state == 0 then 
+		result.add(suma.length - c)
+		result.add(suma.length)
+	sort(result)
+	return result 
 	\end{CodeListing}
 	\caption{Algoritam za segmentaciju stranice}
 \end{program}
 
-Algoritam izračunava gde je potrebno element saseći kako bi se dobili manji elementi. Postoje dva načina po kojima on može da podeli element a to je
-vertikalno i horzontalno. Mesta gde se vrši podela jesu ona mesta gde ima mnogo belih piksela odnosno kada je suma crnih piksela u datom redu (za vertikalno presecanje)
-odnosno u datoj koloni (za horizontalno presecanje) jednaka nuli.
+Algoritam izračunava na kojim mestima je potrebno izdeliti element kako bi se dobili manji elementi. Postoje dva načina po kojima on može da podeli element, a to je
+vertikalno i horzontalno. Mesta gde se vrši podela jesu ona mesta gde ima mnogo belih piksela, odnosno kada je suma crnih piksela u datom redu (za vertikalno presecanje)
+ili u datoj koloni (za horizontalno presecanje) jednaka nuli.
 
 Nakon ovog algoritma, moguće je element podeliti na manje tako što se uzmu podelementi takvi da su presecanja njihove granice. Algoritam se ponavlja rekurzivno
 sa obrnutim metodom, odnosno ako je metod dobijenih podelemenata bio VERTIKALNO onda se algoritam poziva rekurzivno za svaki podelement sa metodom HORIZONTALNO
@@ -194,7 +188,7 @@ određenih karakteristika i napraviti vektor kako bi on bio pogodan za određeni
 \subsubsection{Metode koje enkodiraju samo osnovne podatke o elementu}
 \label{sec:orgd93cd26}
 
-Jedna od najjednostavnijih metoda je da se enkodiraju samo osnovni podaci o elemtu. U daljem delu teksta će ova metoda biti referencirana kao \texttt{simple} preprocesor:
+Jedna od najjednostavnijih metoda je da se enkodiraju samo osnovni podaci o elementu. U daljem delu teksta će ova metoda biti referencirana kao \texttt{simple} preprocesor:
 
 \texttt{simple}: Element je enkodiran kao vektor [E.x, E.y, E.h, E.w], odnosno njegova pozicija i veličina su predstavljeni kao vektor.
 
@@ -207,14 +201,14 @@ Međutim, intuitivno se da zaključiti da zapravo odnosi ovih atributa na slici 
 \subsubsection{Metode enkodiranja bazirane na vrednostima piksela}
 \label{sec:org582acb2}
 
-Druga dva metoda enkodiranja koja su korišćena su bazirana na vrednostima piksela samog elementa.
+Druga dva korišćena metoda enkodiranja su bazirana na vrednostima piksela samog elementa.
 
 Pre svega, potrebno je naglasiti da za svaki element vektori moraju biti iste veličine, pa tako je potrebno uraditi svođenje slika svih elemenata
 na jednaku veličinu:
 
 $$ R(x,y) = \text(resize)(P, L, L)(E.x + x, E.y + y) $$ gde funkcija resize za datu sliku vraća sliku veličine LxL. U ovom radu je odabrana fiksna vrednost L=50.
 
-Sada je moguće izračunati enkodirane vektora po dva modela:
+Sada je moguće izračunati enkodirane vektore po dva modela:
 
 \texttt{pixels}: [R(x,y) za svako (x,y) na slici R veličine LxL]
 
@@ -223,8 +217,8 @@ Sada je moguće izračunati enkodirane vektora po dva modela:
 \subsubsection{Klasifikatori}
 \label{sec:org0ef63da}
 
-U ovom radu su enkodirani vektori dati kao ulaz klasifikatoru. Klasifikatori korišćeni u ovom radu su neuronska mreža i random decision forest. Razlog za
-odabir ovih metoda je bio što su oni pokazivali dobre rezultate u praksi za slične probleme \cite{bitew2018logical} \cite{he2017extracting}
+U ovom radu su enkodirani vektori dati kao ulaz klasifikatoru. Korišćeni klasifikatori su neuronska mreža i random decision forest. Razlog za
+odabir ovih metoda je bio što su oni pokazivali dobre rezultate u praksi za slične probleme \cite{bitew2018logical} \cite{he2017extracting}.
 
 \subsection{Implementacija}
 \label{sec:orgf94d64a}
@@ -240,7 +234,7 @@ sekciji 2.2.
 Izmerena je tačnost klasifikatora za date metode enkodiranja elemenata u vektore. Skup podataka je podeljen u skup za obuku i skup za testiranje
 i izvršena je k-fold kros validacija. 
 
-U sledećoj tabeli su dati rezultati za klasifikatore korišćene u kombinaciji sa metodom enkodiranja elemenata u vektor:
+U tabeli 1 su dati rezultati za klasifikatore korišćene u kombinaciji sa metodom enkodiranja elemenata u vektor:
 
 
 \begin{table}
@@ -258,12 +252,13 @@ U sledećoj tabeli su dati rezultati za klasifikatore korišćene u kombinaciji 
 \caption{Tačnost klasifikatora u odnosu na metode enkodiranja}
 \end{table}
 
-Iz datih rezultata se vidi da je najbolje rezultate dao random decision forest klasifikator za enkodiranje koje nije uključivalo vrednosti samih piksela. Ovakav
-rezultat se može objasniti činjenicom da random decision forest radi dobro kada su ulazni podaci interpretabilni na neki način. Kada već postoji određena intuicija
-oko odnosa ulaznih podataka što važi za metode enkodiranja koje ne uzimaju u obzir sirove vrednosti piksela nego enkodiraju globalne atribute datog segmenta
-na slici kao što su odnosi širine i dužine ili odnos širine i površine ili prosečna vrednost piksela.
+Iz datih rezultata se vidi da je najbolje rezultate dao random decision forest klasifikator za enkodiranje bez uključivanja vrednosti samih piksela. Ovakav
+rezultat se može objasniti činjenicom da random decision forest radi dobro kada su ulazni podaci interpretabilni na neki način. 
+Metode enkodiranja koje ne uzimaju u obzir sirove vrednosti piksela, nego enkodiraju globalne atribute datog segmenta
+na slici poput odnosa širine i dužine, moguće je i intuitivno interpretirati od strane čoveka. Iz tog razloga, ovakvi metodi enkodiranja su pogodni za random decision forest klasifikator.
 
-Sa druge strane, može se videti da je neuronska mreža dala dosta lošije vrednosti nego referentni one rule klasifikator. Objašnjenje za ovu situaciju je
+
+Sa druge strane, može se videti da je neuronska mreža dala dosta lošije vrednosti nego referentni \textit{one rule} klasifikator. Objašnjenje za ovu situaciju je
 izuzetno nizak broj uzoraka korišćenih za obučavanje modela. U obučavanju modela su korišćene samo 3 stranice dokumenta iz razloga što je bilo izuzetno vremenski
 zahtevno  napraviti veći skup labeliranih podataka pa samim tim je i za očekivati lošije rezultate klasifikatora koji zahtevaju izuzetno veliki skup podataka
 za obuku.
@@ -274,7 +269,7 @@ za obuku.
 \label{sec:orge359279}
 
 Random decision forest je pokazao najbolje rezultate za izuzetno jednostavan metod enkodiranja koji ne uzima mnogo procesorskog vremena. Na 7 klasa dobijeni
-rezultati su zadovoljavajući jer u praksi bi bi pogrešno klasifikovani elementi bili ispravljeni ručno. Ono što nedostaje ovom radu jeste
+rezultati su zadovoljavajući jer bi u praksi pogrešno klasifikovani elementi bili ispravljeni ručno. Ono što nedostaje ovom radu jeste
 analiza klasifikatora na većem skupu podataka, kao i određivanje matrice konfuzije za date klase. Praktično gledano, pogrešna klasifikacija paragrafa u listing je manje
 značajna od, na primer, pogrešne klasifikacije teksta u sliku.
 
