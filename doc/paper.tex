@@ -15,20 +15,31 @@
 \usepackage{capt-of}
 \usepackage{float}
 \usepackage{fancyvrb}
+\usepackage{fancyhdr}
 
 % Let us first define a custom Verbatim environment, that saves us a lot of writing
   \DefineVerbatimEnvironment{CodeListing}{Verbatim}%
     {showtabs,commandchars=\\\{\}}% showspaces and showtabs only for visualizing
 
 
+\pagestyle{fancy}
+\addtolength{\headheight}{\baselineskip}
+
 \floatstyle{ruled}
 \newfloat{program}{p}{}
 \floatname{program}{Kod}
+\fancyhf{}
+\setlength{\headheight}{48pt}
+\fancyhead[L]{Stefan Nožinić, II godina master studija računarskih nauka \\
+Departman za matematiku i informatiku, Prirodno-matematički fakultet \\
+Univerzitet u Novom Sadu. \\
+}
+
 
 \begin{document}
 
 \title{Segmentacija i klasifikacija elemenata na stranici dokumenta}
-\author{Stefan Nožinić, student II godine master studija računarskih nauka, departman za matematiku i informatiku, Prirodno-matematički fakultet, Univerzitet u Novom Sadu. Mentor: \MakeLowercase{prof. dr} Miloš Radovanović}
+\author{Stefan Nožinić, Univerzitet u Novom Sadu. \\ Mentor: \MakeLowercase{prof. dr} Miloš Radovanović}
 
 \begin{abstract}
     U ovom radu je implementiran i evaluiran sistem za segmentaciju i klasifikaciju elemenata stranice dokumenta. 
