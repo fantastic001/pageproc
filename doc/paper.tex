@@ -238,6 +238,10 @@ Sada je moguće izračunati enkodirane vektore po dva modela:
 U ovom radu su enkodirani vektori dati kao ulaz klasifikatoru. Korišćeni klasifikatori su neuronska mreža i random decision forest. Razlog za
 odabir ovih metoda je bio što su oni pokazivali dobre rezultate u praksi za slične probleme \cite{bitew2018logical} \cite{he2017extracting}.
 
+Random decision forest je koristio 100 stabala za klasifikaciju gde je kreiranje svakog stabla bilo ograničeno sa maksimalnom dubinom od 2. Kriterijum podele je bio vrednosti \textit{Gini} koeficijenta. 
+
+Neuronska mreža je imala jedan skriven sloj veličine 100 sa \textit{ReLU} aktivacionom funkcijom. 
+
 \subsection{Implementacija}
 \label{sec:orgf94d64a}
 
@@ -252,7 +256,7 @@ sekciji 2.2.
 Izmerena je tačnost klasifikatora za date metode enkodiranja elemenata u vektore. Skup podataka je podeljen u skup za obuku i skup za testiranje
 i izvršena je k-fold kros validacija. 
 
-U tabeli 1 su dati rezultati za klasifikatore korišćene u kombinaciji sa metodom enkodiranja elemenata u vektor:
+U tabeli 1 su dati rezultati za klasifikatore korišćene u kombinaciji sa metodom enkodiranja elemenata u vektor.
 
 
 \begin{table}
