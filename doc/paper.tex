@@ -67,7 +67,7 @@ Mentor: \MakeLowercase{prof. dr} Miloš Radovanović
 Optičko prepoznavanje karaktera (eng. OCR - Optical Character Recognition) igra važnu ulogu u današnje vreme kao način pretvaranja fizičkih dokumenata u digitalne \cite{mori1999optical}.
 Međutim, pre samog prepoznavanja karaktera, dokumenti imaju specifičnu strukturu u smislu organizacije elemenata na stranici. Na primer, naučni radovi su često
 organizovani tako da svaka stranica ima dve kolone, gde na prvoj postoji i naslov koji se širi preko cele stranice po širini. Zbog ovoga je potrebno uraditi određene korake za preprocesiranje
-pre samog prepoznavanja teksta kako bi se elementi izdvojili na stranici. Koraci za preprocesiranje obuhvataju segmentaciju dokumenta i klasifikaciju delova stranice u određene klase. 
+pre samog prepoznavanja teksta kako bi se elementi izdvojili na stranici. Preprocesiranje obuhvata segmentaciju dokumenta i klasifikaciju delova stranice u određene klase. 
 Na stranicama, pored teksta, često se mogu pronaći i drugi elementi poput tabela, slika, itd.
 Sam tekst može biti napisan i različitim stilom i samim tim nosi različito semantičko značenje. Primer ovoga je naslov sekcije kojeg je potrebno posmatrati
 drugačije od paragrafa unutar sekcije jer sam naslov predstavlja neku semantičku celinu. 
@@ -78,10 +78,9 @@ U ovom radu je implementirana segmentacija elemenata stranice tako da se dobije 
 kao što su: slika, naslov, paragraf, listing, tabela itd.
 
 U sekciji 2 je dat pregled korišćenih metoda i to izdvojenih u podsekcije gde se u sekcijama 2.1 i 2.2 opisuje ulaz i izlaz samog sistema i uvode strukture koje su
-koriščene. U sekciji 2.3 je opisana metoda segmentacije, dok u sekciji 2.4 su opisane metode klasifikacije elemenata. U sekciji 2.5 su dati implementacioni detalji
-u smislu korišćenih tehnologija.
+koriščene. U sekciji 2.3 je opisana metoda segmentacije, dok u sekciji 2.4 su opisane metode klasifikacije elemenata. U sekciji 2.5 su dati detalji implementacije.
 
-U sekciji 3 je dat pregled rezultata opisanih metoda kao i diskusija rezultata u smislu njihovog praktičnog značaja.
+U sekciji 3 je dat pregled rezultata opisanih metoda kao i diskusija njihovog praktičnog značaja.
 
 U sekciji 4 je dat zaključak kao i predlozi za buduće radove.
 
@@ -94,11 +93,11 @@ Sekcija 5 daje pregled literature koja je korišćena.
 \subsection{Ulazni podaci}
 \label{sec:org36199a1}
 
-Dokument je lista stranica gde je svaka stranica P predstavljena kao slika, odnosno matrica piksela. Ovo je moguće uraditi procesom skeniranja ručno napisanog dokumenta, 
+Dokument je sekvenca stranica predstavljenih kao RGB slike $$ D = (P_1, P_2, ..., P_n) $$ gde je $$ 0 \le P_{i}(x,y, c) \le 1$$ vrednost piksela na i-toj stranici na poziciji $ (x,y) $  na kanalu $ c \in \{R, G, B\}$.
+
+Ovakvu reprezentaciju je moguće dobiti procesom skeniranja ručno napisanog dokumenta, 
 ili procesom renderovanja PDF dokumenata uz pomoć postojećih alata kao što je Poppler \cite{poppler}.
 
-Dakle dokument se može posmatrati kao sekvenca slika njegovih stranica $$ D = (P_1, P_2, ..., P_n) $$ gde je $$ 0 \le P_{i}(x,y, c) \le 1$$ vrednost piksela na i-toj
-stranici na poziciji (x,y) na kanalu c (slika je u RBG formatu boja, odnosno c je element skupa \{R, G, B\}).
 
 Segmentacija i klasifikacija se radi na svakoj stranici izolovano, odnosno rezultati segmentacije i klasifikacije na i-toj stranici su nezavisni od rezultata na j-toj
 stranici.
@@ -107,7 +106,7 @@ stranici.
 \subsection{Izlazni podaci}
 \label{sec:org75e117b}
 
-Izlaz sistema je skup elemenata gde je svaki element uređena torka (x,y,w,h,k) gde:
+Izlaz sistema je skup elemenata gde je svaki element uređena n-torka (x,y,w,h,k) gde:
 
 \begin{itemize}
 \item x predstavlja x-koordinatu gornjeg levog piksela datog elementa
@@ -185,7 +184,7 @@ Algorithm xy-cuts(P: stranica, E = (x,y,h,w), metod)
 \end{program}
 
 Algoritam izračunava na kojim mestima je potrebno podeliti element kako bi se dobili manji elementi. Postoje dva načina po kojima on može da podeli element, a to je
-vertikalno i horizontalno. Mesta gde se vrši podela jesu ona mesta gde ima mnogo belih piksela, odnosno kada je suma crnih piksela u datom redu (za vertikalno presecanje)
+vertikalno i horizontalno. Mesta gde se vrši podela jesu ona mesta gde ima mnogo belih piksela, odnosno kada je suma crnih piksela u datoj vrsti (za vertikalno presecanje)
 ili u datoj koloni (za horizontalno presecanje) jednaka nuli.
 
 Nakon ovog algoritma, moguće je element podeliti na manje tako što se uzmu podelementi takvi da su presecanja njihove granice. Algoritam se ponavlja rekurzivno
@@ -201,32 +200,32 @@ određenih karakteristika i napraviti vektor kako bi on bio pogodan za određeni
 
 
 
-\subsubsection{Metode koje enkodiraju samo osnovne podatke o elementu}
+\subsubsection{Metode koje kodiraju samo osnovne podatke o elementu}
 \label{sec:orgd93cd26}
 
-Jedna od najjednostavnijih metoda je da se enkodiraju samo osnovni podaci o elementu. U daljem delu teksta će ova metoda biti referencirana kao \texttt{simple} preprocesor:
+Jedna od najjednostavnijih metoda je da se kodiraju samo osnovni podaci o elementu. U daljem delu teksta će ova metoda biti referencirana kao \texttt{simple} preprocesor:
 
-\texttt{simple}: Element je enkodiran kao vektor [E.x, E.y, E.h, E.w], odnosno njegova pozicija i veličina su predstavljeni kao vektor.
+\texttt{simple}: Element je kodiran kao vektor [E.x, E.y, E.h, E.w], odnosno njegova pozicija i veličina su predstavljeni kao vektor.
 
 
 Međutim, intuitivno se da zaključiti da zapravo odnosi ovih atributa na slici mogu predvideti klasu nekog elementa. Pa tako, na primer, paragraf
-često nema jednak odnos visine i širine itd. Zbog ovoga, drugi način enkodiranja, koji još uvek zadržava jednostavnost, jeste:
+često nema jednak odnos visine i širine itd. Zbog ovoga, drugi način kodiranja, koji još uvek zadržava jednostavnost, jeste:
 
-\texttt{img\_attrs}: Element je enkodiran kao vektor:  [E.h * E.w, E.w / (E.h*E.w), E.h / E.w, prosečna vrednost piksela u E]
+\texttt{img\_attrs}: Element je kodiran kao vektor:  [E.h * E.w, E.w / (E.h*E.w), E.h / E.w, prosečna vrednost piksela u E]
 
 \newpage 
 
-\subsubsection{Metode enkodiranja bazirane na vrednostima piksela}
+\subsubsection{Metode kodiranja bazirane na vrednostima piksela}
 \label{sec:org582acb2}
 
-Druga dva korišćena metoda enkodiranja su bazirana na vrednostima piksela samog elementa.
+Druga dva korišćena metoda kodiranja su bazirana na vrednostima piksela samog elementa.
 
 Pre svega, potrebno je naglasiti da za svaki element vektori moraju biti iste veličine, pa tako je potrebno uraditi svođenje slika svih elemenata
 na jednaku veličinu:
 
 $$ R(x,y) = \text(resize)(P, L, L)(E.x + x, E.y + y) $$ gde funkcija resize za datu sliku vraća sliku veličine LxL. U ovom radu je odabrana fiksna vrednost L=50.
 
-Sada je moguće izračunati enkodirane vektore po dva modela:
+Sada je moguće izračunati kodirane vektore po dva modela:
 
 \texttt{pixels}: [R(x,y) za svako (x,y) na slici R veličine LxL]
 
@@ -235,7 +234,7 @@ Sada je moguće izračunati enkodirane vektore po dva modela:
 \subsubsection{Klasifikatori}
 \label{sec:org0ef63da}
 
-U ovom radu su enkodirani vektori dati kao ulaz klasifikatoru. Korišćeni klasifikatori su neuronska mreža i random decision forest. Razlog za
+U ovom radu su kodirani vektori dati kao ulaz klasifikatoru. Korišćeni klasifikatori su neuronska mreža i random decision forest. Razlog za
 odabir ovih metoda je bio što su oni pokazivali dobre rezultate u praksi za slične probleme \cite{bitew2018logical} \cite{he2017extracting}.
 
 Random decision forest je koristio 100 stabala za klasifikaciju gde je kreiranje svakog stabla bilo ograničeno sa maksimalnom dubinom od 2. Kriterijum podele je bio vrednosti \textit{Gini} koeficijenta. 
@@ -253,15 +252,15 @@ sekciji 2.2.
 \label{sec:orga78d38e}
 
 
-Izmerena je tačnost klasifikatora za date metode enkodiranja elemenata u vektore. Skup podataka je podeljen u skup za obuku i skup za testiranje
-i izvršena je k-fold kros validacija. 
+Izmerena je tačnost klasifikatora za date metode kodiranja elemenata u vektore. Skup podataka je podeljen u skup za obuku i skup za testiranje
+i izvršena je \textit{k-fold} unakrsna validacija. 
 
-U tabeli 1 su dati rezultati za klasifikatore korišćene u kombinaciji sa metodom enkodiranja elemenata u vektor.
+U tabeli 1 su dati rezultati za klasifikatore korišćene u kombinaciji sa metodom kodiranja elemenata u vektor.
 
 
 \begin{table}
 \begin{tabular}{rllr}
- & Metod enkodiranja & Klasifikator & Tačnost (\%)\\
+ & Metod kodiranja & Klasifikator & Tačnost (\%)\\
 \hline
 1 & \texttt{histogram} & RF & 71.792\\
 2 & \texttt{img\_attrs} & RF & 72.034\\
@@ -271,13 +270,13 @@ U tabeli 1 su dati rezultati za klasifikatore korišćene u kombinaciji sa metod
 6 & \texttt{simple} & RF & 70.422\\
 7 & \texttt{simple} & one rule & 63.216\\
 \end{tabular}
-\caption{Tačnost klasifikatora u odnosu na metode enkodiranja}
+\caption{Tačnost klasifikatora u odnosu na metode kodiranja}
 \end{table}
 
-Iz datih rezultata se vidi da je najbolje rezultate dao random decision forest klasifikator za enkodiranje bez uključivanja vrednosti samih piksela. Ovakav
+Iz datih rezultata se vidi da je najbolje rezultate dao random decision forest klasifikator za kodiranje bez uključivanja vrednosti samih piksela. Ovakav
 rezultat se može objasniti činjenicom da random decision forest radi dobro kada su ulazni podaci interpretabilni na neki način. 
-Metode enkodiranja koje ne uzimaju u obzir sirove vrednosti piksela, nego enkodiraju globalne atribute datog segmenta
-na slici poput odnosa širine i dužine, moguće je i intuitivno interpretirati od strane čoveka. Iz tog razloga, ovakvi metodi enkodiranja su pogodni za random decision forest klasifikator.
+Metode kodiranja koje ne uzimaju u obzir sirove vrednosti piksela, nego kodiraju globalne atribute datog segmenta
+na slici poput odnosa širine i dužine, moguće je i intuitivno interpretirati od strane čoveka. Iz tog razloga, ovakvi metodi kodiranja su pogodni za random decision forest klasifikator.
 
 
 Sa druge strane, može se videti da je neuronska mreža dala dosta lošije vrednosti nego referentni \textit{one rule} klasifikator. Objašnjenje za ovu situaciju je
@@ -290,7 +289,7 @@ za obuku.
 \section{Zaključak}
 \label{sec:orge359279}
 
-Random decision forest je pokazao najbolje rezultate za izuzetno jednostavan metod enkodiranja koji ne uzima mnogo procesorskog vremena. Na 7 klasa dobijeni
+Random decision forest je pokazao najbolje rezultate za izuzetno jednostavan metod kodiranja koji ne uzima mnogo procesorskog vremena. Na 7 klasa dobijeni
 rezultati su zadovoljavajući jer bi u praksi pogrešno klasifikovani elementi bili ispravljeni ručno. Ono što nedostaje ovom radu jeste
 analiza klasifikatora na većem skupu podataka, kao i određivanje matrice konfuzije za date klase. Praktično gledano, pogrešna klasifikacija paragrafa u listing je manje
 značajna od, na primer, pogrešne klasifikacije teksta u sliku.
