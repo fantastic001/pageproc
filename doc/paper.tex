@@ -117,7 +117,7 @@ Izlaz sistema je skup elemenata gde je svaki element uređena n-torka (x,y,w,h,k
 \end{itemize}
 
 Pored ovog skupa, izlaz je i funkcija $$ p : A \to A $$ koja određuje hijerarhijski raspored elemenata u stablu, gde za element $ x $ važi da se
-sadrži u elementu $ p(x) $. 
+sadrži u elementu $ p(x) $. Koren stabla je ceo dokument i za njega važi $ p(r) = r $.
 
 Klasa dokumenta je klasa iz predefinisanog skupa mogućih klasa i to $$ k \in \{\text{NONE}, \text{IMAGE}, \text{TEXT}, \text{FORMULA}, \text{HEADING}, \text{LISTING}, \text{TABLE}\} $$ 
 
@@ -128,7 +128,7 @@ Klasa dokumenta je klasa iz predefinisanog skupa mogućih klasa i to $$ k \in \{
 
 Za segmentaciju je korišćen \textit{xy-cuts} algoritam \cite{ha1995recursive}. Algoritam radi hijerarhijsko segmentiranje dokumenta na sledeći način. Neka $ e = (x,y,w,h) $ predstavlja određeni
 deo dokumenta. Algoritam za dati element izbacuje elemente $ e_1, ..., e_l $ za koje važi $ p(e_i) = e, 1 \le i \le l $. U slučaju segmentiranja stranice, kreće se od same stranice kao korenskog elementa
-stabla i stranica se rekurzivno deli na manje delove po postupku datom u kodu 1.
+stabla i stranica se rekurzivno deli na manje delove po postupku datom u kodu 1. Postupak deljenja se završava kada element više nema mesto gde se može podeliti na manji, odnosno, kada ne postoji kolona (ili vrsta) gde je broj crnih piksela veći od nula.
 
 
 \begin{program}
@@ -208,8 +208,8 @@ Jedna od najjednostavnijih metoda je da se kodiraju samo osnovni podaci o elemen
 \texttt{simple}: Element je kodiran kao vektor [E.x, E.y, E.h, E.w], odnosno njegova pozicija i veličina su predstavljeni kao vektor.
 
 
-Međutim, intuitivno se da zaključiti da zapravo odnosi ovih atributa na slici mogu predvideti klasu nekog elementa. Pa tako, na primer, paragraf
-često nema jednak odnos visine i širine itd. Zbog ovoga, drugi način kodiranja, koji još uvek zadržava jednostavnost, jeste:
+Međutim, može se pretpostaviti da odnosi ovih atributa na slici mogu predvideti klasu nekog elementa. Pa tako, na primer, paragraf
+često nema jednak odnos visine i širine. Ova pretpostavka je proveravana upotrebom sledećeg načina kodiranja:
 
 \texttt{img\_attrs}: Element je kodiran kao vektor:  [E.h * E.w, E.w / (E.h*E.w), E.h / E.w, prosečna vrednost piksela u E]
 
@@ -223,7 +223,8 @@ Druga dva korišćena metoda kodiranja su bazirana na vrednostima piksela samog 
 Pre svega, potrebno je naglasiti da za svaki element vektori moraju biti iste veličine, pa tako je potrebno uraditi svođenje slika svih elemenata
 na jednaku veličinu:
 
-$$ R(x,y) = \text(resize)(P, L, L)(E.x + x, E.y + y) $$ gde funkcija resize za datu sliku vraća sliku veličine LxL. U ovom radu je odabrana fiksna vrednost L=50.
+$$ R(x,y) = \text(resize)(P, L, L)(E.x + x, E.y + y) $$ gde funkcija resize za datu sliku vraća sliku veličine LxL. U ovom radu je odabrana fiksna vrednost L=50. Eksperimentalno se pokazalo da je $ L=50 $ minimalna veličina tako da se ne vidi ogromno opadanje u tačnosti prepoznavanja. Razlog za odabir male vrednosti jeste da bi se poboljšale performanse u vremenskom smislu
+izračunavanja.
 
 Sada je moguće izračunati kodirane vektore po dva modela:
 
@@ -234,10 +235,10 @@ Sada je moguće izračunati kodirane vektore po dva modela:
 \subsubsection{Klasifikatori}
 \label{sec:org0ef63da}
 
-U ovom radu su kodirani vektori dati kao ulaz klasifikatoru. Korišćeni klasifikatori su neuronska mreža i random decision forest. Razlog za
+U ovom radu su kodirani vektori dati kao ulaz klasifikatoru. Korišćeni klasifikatori su neuronska mreža i \textit{random decision forest}. Razlog za
 odabir ovih metoda je bio što su oni pokazivali dobre rezultate u praksi za slične probleme \cite{bitew2018logical} \cite{he2017extracting}.
 
-Random decision forest je koristio 100 stabala za klasifikaciju gde je kreiranje svakog stabla bilo ograničeno sa maksimalnom dubinom od 2. Kriterijum podele je bio vrednosti \textit{Gini} koeficijenta. 
+\textit{Random decision forest} je koristio 100 stabala za klasifikaciju gde je kreiranje svakog stabla bilo ograničeno sa maksimalnom dubinom od 2. Kriterijum podele je bio vrednosti \textit{Gini} koeficijenta. 
 
 Neuronska mreža je imala jedan skriven sloj veličine 100 sa \textit{ReLU} aktivacionom funkcijom. 
 
@@ -273,10 +274,10 @@ U tabeli 1 su dati rezultati za klasifikatore korišćene u kombinaciji sa metod
 \caption{Tačnost klasifikatora u odnosu na metode kodiranja}
 \end{table}
 
-Iz datih rezultata se vidi da je najbolje rezultate dao random decision forest klasifikator za kodiranje bez uključivanja vrednosti samih piksela. Ovakav
-rezultat se može objasniti činjenicom da random decision forest radi dobro kada su ulazni podaci interpretabilni na neki način. 
+Iz datih rezultata se vidi da je najbolje rezultate dao \textit{random decision forest} klasifikator za kodiranje bez uključivanja vrednosti samih piksela. Ovakav
+rezultat se može objasniti činjenicom da \textit{random decision forest} radi dobro kada su ulazni podaci interpretabilni na neki način. 
 Metode kodiranja koje ne uzimaju u obzir sirove vrednosti piksela, nego kodiraju globalne atribute datog segmenta
-na slici poput odnosa širine i dužine, moguće je i intuitivno interpretirati od strane čoveka. Iz tog razloga, ovakvi metodi kodiranja su pogodni za random decision forest klasifikator.
+na slici poput odnosa širine i dužine, moguće je i intuitivno interpretirati od strane čoveka. Iz tog razloga, ovakvi metodi kodiranja su pogodni za \textit{random decision forest} klasifikator.
 
 
 Sa druge strane, može se videti da je neuronska mreža dala dosta lošije vrednosti nego referentni \textit{one rule} klasifikator. Objašnjenje za ovu situaciju je
@@ -289,7 +290,7 @@ za obuku.
 \section{Zaključak}
 \label{sec:orge359279}
 
-Random decision forest je pokazao najbolje rezultate za izuzetno jednostavan metod kodiranja koji ne uzima mnogo procesorskog vremena. Na 7 klasa dobijeni
+\textit{Random decision forest} je pokazao najbolje rezultate za izuzetno jednostavan metod kodiranja koji ne uzima mnogo procesorskog vremena. Na 7 klasa dobijeni
 rezultati su zadovoljavajući jer bi u praksi pogrešno klasifikovani elementi bili ispravljeni ručno. Ono što nedostaje ovom radu jeste
 analiza klasifikatora na većem skupu podataka, kao i određivanje matrice konfuzije za date klase. Praktično gledano, pogrešna klasifikacija paragrafa u listing je manje
 značajna od, na primer, pogrešne klasifikacije teksta u sliku.
