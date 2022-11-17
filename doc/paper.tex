@@ -39,7 +39,14 @@ Univerzitet u Novom Sadu. \\
 \begin{document}
 
 \title{Segmentacija i klasifikacija elemenata na stranici dokumenta}
-\author{Stefan Nožinić, Univerzitet u Novom Sadu. \\ Mentor: \MakeLowercase{prof. dr} Miloš Radovanović}
+\author{Stefan Nožinić \\
+student II godine master studija računarskih nauka \\
+Departman za matematiku i informatiku \\
+Prirodno-matematički fakultet \\
+Univerzitet u Novom Sadu. \\
+Tip rada: seminarski rad \\
+Mentor: \MakeLowercase{prof. dr} Miloš Radovanović
+}
 
 \begin{abstract}
     U ovom radu je implementiran i evaluiran sistem za segmentaciju i klasifikaciju elemenata stranice dokumenta. 
@@ -51,7 +58,7 @@ Univerzitet u Novom Sadu. \\
 
 
 \maketitle
-
+\newpage
 
 
 \section{Uvod}
@@ -206,6 +213,8 @@ Međutim, intuitivno se da zaključiti da zapravo odnosi ovih atributa na slici 
 često nema jednak odnos visine i širine itd. Zbog ovoga, drugi način enkodiranja, koji još uvek zadržava jednostavnost, jeste:
 
 \texttt{img\_attrs}: Element je enkodiran kao vektor:  [E.h * E.w, E.w / (E.h*E.w), E.h / E.w, prosečna vrednost piksela u E]
+
+\newpage 
 
 \subsubsection{Metode enkodiranja bazirane na vrednostima piksela}
 \label{sec:org582acb2}
