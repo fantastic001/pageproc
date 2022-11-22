@@ -55,14 +55,20 @@ Mentor: \MakeLowercase{prof. dr} Miloš Radovanović
 \begin{frame}
 	\frametitle{Problem}
 	% graphics - rendered document and its tree representation 
-
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=\textwidth]{./png/segmented-doc.png}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=\textwidth]{./png/tree.png}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 
 \begin{frame}
 	\frametitle{Reprezentacija celog sistema}
-	% show diagram
-
+	\includegraphics[width=\textwidth]{./png/system.png}
 \end{frame}
 
 \begin{frame}
@@ -87,14 +93,19 @@ Mentor: \MakeLowercase{prof. dr} Miloš Radovanović
 \begin{frame}
 	\frametitle{Segmentacija dokumenta}
 	% show picture 
-
-
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=\textwidth]{./png/segmentation-example.png}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=\textwidth]{./png/segmentation-histogram.png}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Proces klasifikacije}
-	% show diagram
-
+	\includegraphics[width=\textwidth]{./png/classification.png}
 \end{frame}
 
 \begin{frame}
@@ -110,12 +121,19 @@ Mentor: \MakeLowercase{prof. dr} Miloš Radovanović
 
 \begin{frame}
 	\frametitle{Random decision forest}
-
+	\begin{itemize}
+		\item 100 stabala za klasifikaciju
+		\item kreiranje svakog stabla bilo ograničeno sa maksimalnom dubinom od 2
+		\item Kriterijum podele je bio vrednosti \textit{Gini} koeficijenta
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Neuronska mreža}
-
+	\begin{itemize}
+		\item jedan skriven sloj veličine 100 sa \textit{ReLU} aktivacionom funkcijom
+		\item Trenirana standardnim BP algoritmom
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -139,18 +157,28 @@ Mentor: \MakeLowercase{prof. dr} Miloš Radovanović
 
 \begin{frame}
 	\frametitle{Zaključak}
-
-
+	\begin{itemize}
+		\item \textit{Random decision forest} je pokazao najbolje rezultate za izuzetno jednostavan metod kodiranja
+		\item zadovoljavajući rezultati na 7 klasa.
+		\item U Praktičnoj primeni, pogrešno klasifikovani elementi bi mogli da se modifikuju ručno.
+		\item Neke pogrešno klasifikovane elemente ne treba smatrati podjednako lošim kao neke druge pogrešno klasifikovane elemente.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Poboljšanja}
-
+	\begin{itemize}
+		\item Upotrebiti konvolucionu neuronsku mrežu.
+		\item Proširiti skup za obuku.
+		\item Određivanje matrice konfuzije za date klase.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Pitanja}
-
+	\begin{center}
+		\huge{?}
+	\end{center}
 \end{frame}
 
 
